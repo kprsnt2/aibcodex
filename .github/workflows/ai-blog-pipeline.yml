@@ -1,0 +1,71 @@
+name: AI Blog Pipeline
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'blog_drafts/**'
+      - 'config/author_profile.md'
+      - 'scripts/**'
+      - '.github/workflows/ai-blog-pipeline.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Pick latest draft
+        id: draft
+        run: |
+          latest=$(ls -t blog_drafts/*.md blog_drafts/*.txt 2>/dev/null | head -n 1)
+          if [ -z "$latest" ]; then
+            echo "No draft found in blog_drafts/."
+            exit 1
+          fi
+          echo "path=$latest" >> $GITHUB_OUTPUT
+
+      - name: Generate blog post
+        env:
+          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          NVIDIA_MODEL: ${{ vars.NVIDIA_MODEL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL }}
+        run: |
+          python scripts/generate_blog.py --draft "${{ steps.draft.outputs.path }}"
+
+      - name: Build static site
+        run: python scripts/build_site.py
+
+      - name: Commit generated content
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add generated_posts site
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "chore: generate blog from latest draft"
+          git push
