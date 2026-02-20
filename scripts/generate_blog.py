@@ -17,6 +17,7 @@ class ProviderConfig:
     name: str
     model: str
     api_key: str
+    base_url: str
 
 
 def read_text(path: Path) -> str:
@@ -42,19 +43,77 @@ def slugify(value: str) -> str:
 
 
 def provider_from_env() -> ProviderConfig:
-    provider = os.getenv("AI_PROVIDER", "gemini").lower()
-    if provider == "gemini":
-        return ProviderConfig("gemini", os.getenv("GEMINI_MODEL", "gemini-1.5-pro"), os.getenv("GEMINI_API_KEY", ""))
-    if provider == "claude":
-        return ProviderConfig("claude", os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022"), os.getenv("CLAUDE_API_KEY", ""))
-    raise ValueError("AI_PROVIDER must be either 'gemini' or 'claude'")
+    """Resolve provider from AI_PROVIDER or auto-detect from available API keys."""
+    forced = os.getenv("AI_PROVIDER", "").strip().lower()
+
+    openai_key = os.getenv("OPENAI_API_KEY", "")
+    openrouter_key = os.getenv("OPENROUTER_API_KEY", "")
+    nvidia_key = os.getenv("NVIDIA_API_KEY", "")
+    gemini_key = os.getenv("GEMINI_API_KEY", "")
+    claude_key = os.getenv("CLAUDE_API_KEY", "")
+
+    mapping = {
+        "openai": ProviderConfig(
+            "openai",
+            os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+            openai_key,
+            os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+        ),
+        "openrouter": ProviderConfig(
+            "openrouter",
+            os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
+            openrouter_key,
+            os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
+        ),
+        "nvidia": ProviderConfig(
+            "nvidia",
+            os.getenv("NVIDIA_MODEL", "meta/llama-3.1-70b-instruct"),
+            nvidia_key,
+            os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"),
+        ),
+        "gemini": ProviderConfig(
+            "gemini",
+            os.getenv("GEMINI_MODEL", "gemini-1.5-pro"),
+            gemini_key,
+            "https://generativelanguage.googleapis.com/v1beta",
+        ),
+        "claude": ProviderConfig(
+            "claude",
+            os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022"),
+            claude_key,
+            "https://api.anthropic.com/v1",
+        ),
+    }
+
+    if forced:
+        if forced not in mapping:
+            raise ValueError("Unsupported AI_PROVIDER. Use openai/openrouter/nvidia/gemini/claude")
+        config = mapping[forced]
+        if not config.api_key:
+            raise RuntimeError(f"Missing key for forced provider '{forced}'")
+        return config
+
+    for name in ["openai", "openrouter", "nvidia", "gemini", "claude"]:
+        if mapping[name].api_key:
+            return mapping[name]
+
+    raise RuntimeError(
+        "No API key configured. Set one key: OPENAI_API_KEY or OPENROUTER_API_KEY or NVIDIA_API_KEY "
+        "(gemini/claude also supported)."
+    )
 
 
 def build_prompt(profile_md: str, draft_md: str, draft_filename: str) -> str:
     return f"""
 You are an expert technical blog writer.
 Create a publication-ready markdown blog post using profile + draft `{draft_filename}`.
-Return ONLY markdown with valid frontmatter:
+
+Rules:
+- Keep factual claims tied to provided draft data.
+- If draft references images/charts/videos, include them naturally in markdown.
+- Include: compelling intro, table of contents, practical sections, failures/lessons, conclusion.
+- Keep paragraphs short and clear.
+- Return ONLY markdown with valid frontmatter:
 ---
 title:
 summary:
@@ -74,14 +133,34 @@ draft_source:
 def http_post_json(url: str, payload: dict, headers: dict[str, str]) -> dict:
     data = json.dumps(payload).encode("utf-8")
     req = request.Request(url, data=data, headers={"content-type": "application/json", **headers}, method="POST")
-    with request.urlopen(req, timeout=90) as resp:
+    with request.urlopen(req, timeout=120) as resp:
         return json.loads(resp.read().decode("utf-8"))
 
 
+def generate_with_openai_compatible(config: ProviderConfig, prompt: str) -> str:
+    payload = {
+        "model": config.model,
+        "temperature": 0.4,
+        "messages": [
+            {"role": "system", "content": "You write high-quality technical blog posts in markdown."},
+            {"role": "user", "content": prompt},
+        ],
+    }
+    headers = {"authorization": f"Bearer {config.api_key}"}
+
+    if config.name == "openrouter":
+        headers["HTTP-Referer"] = os.getenv("OPENROUTER_SITE_URL", "https://example.com")
+        headers["X-Title"] = os.getenv("OPENROUTER_APP_NAME", "Open AI Blog Generator")
+
+    data = http_post_json(f"{config.base_url}/chat/completions", payload, headers)
+    choices = data.get("choices", [])
+    if not choices:
+        raise RuntimeError("No response choices returned from provider")
+    return choices[0].get("message", {}).get("content", "").strip()
+
+
 def generate_with_gemini(config: ProviderConfig, prompt: str) -> str:
-    if not config.api_key:
-        raise RuntimeError("Missing GEMINI_API_KEY")
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{config.model}:generateContent?key={config.api_key}"
+    url = f"{config.base_url}/models/{config.model}:generateContent?key={config.api_key}"
     payload = {"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"temperature": 0.4}}
     data = http_post_json(url, payload, {})
     parts = data["candidates"][0]["content"]["parts"]
@@ -89,8 +168,6 @@ def generate_with_gemini(config: ProviderConfig, prompt: str) -> str:
 
 
 def generate_with_claude(config: ProviderConfig, prompt: str) -> str:
-    if not config.api_key:
-        raise RuntimeError("Missing CLAUDE_API_KEY")
     payload = {
         "model": config.model,
         "max_tokens": 2200,
@@ -98,7 +175,7 @@ def generate_with_claude(config: ProviderConfig, prompt: str) -> str:
         "messages": [{"role": "user", "content": prompt}],
     }
     data = http_post_json(
-        "https://api.anthropic.com/v1/messages",
+        f"{config.base_url}/messages",
         payload,
         {"x-api-key": config.api_key, "anthropic-version": "2023-06-01"},
     )
@@ -138,7 +215,14 @@ def main() -> None:
     title = extract_title(draft_md, draft_path)
     prompt = build_prompt(profile_md, draft_md, draft_path.name)
     provider = provider_from_env()
-    raw = generate_with_gemini(provider, prompt) if provider.name == "gemini" else generate_with_claude(provider, prompt)
+
+    if provider.name in {"openai", "openrouter", "nvidia"}:
+        raw = generate_with_openai_compatible(provider, prompt)
+    elif provider.name == "gemini":
+        raw = generate_with_gemini(provider, prompt)
+    else:
+        raw = generate_with_claude(provider, prompt)
+
     post = ensure_frontmatter(raw, title=title, draft_source=str(draft_path))
 
     if args.dry_run:
@@ -146,7 +230,7 @@ def main() -> None:
         return
 
     output_path = write_post(Path(args.outdir), title, post)
-    print(json.dumps({"generated_post": str(output_path)}))
+    print(json.dumps({"generated_post": str(output_path), "provider": provider.name, "model": provider.model}))
 
 
 if __name__ == "__main__":
