@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beyond the Scorecard: Unpacking Win Probability Shifts in T20 Cricket</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .glass { backdrop-filter: blur(8px); }
+    .prose h1 { font-size: 2rem; font-weight: 800; margin-top: 1rem; margin-bottom: .75rem; }
+    .prose h2 { font-size: 1.4rem; font-weight: 700; margin-top: 1.2rem; margin-bottom: .6rem; }
+    .prose h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1rem; margin-bottom: .4rem; }
+    .prose p { color: #d1d5db; line-height: 1.75; margin: .65rem 0; }
+    .prose ul, .prose ol { margin: .8rem 0 .8rem 1.1rem; color: #d1d5db; }
+    .prose li { margin: .2rem 0; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+        <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_0%_10%,rgba(56,189,248,0.10),transparent_38%),radial-gradient(circle_at_100%_0%,rgba(168,85,247,0.10),transparent_30%)]"></div>
+        <main class="mx-auto max-w-3xl p-6 md:p-10">
+          <a class="inline-flex rounded-full border border-slate-700 px-3 py-1 text-sm text-cyan-300 hover:border-cyan-400" href="/index.html">← Back to home</a>
+          <article class="prose mt-6 rounded-3xl border border-slate-700/60 bg-slate-900/75 p-8 shadow-2xl">
+            <h1>Beyond the Scorecard: Unpacking Win Probability Shifts in T20 Cricket</h1>
+            <p class="text-slate-400">2023-10-27</p>
+            <h2>Author Profile</h2>
+<h1>Your Name</h1>
+<h2>About</h2>
+<p>I am a data-focused builder who turns analysis into practical product ideas.</p>
+<h2>Role</h2>
+<ul>
+<li>Profession: AI Engineer / Product Builder</li>
+<li>Focus: LLM apps, automation, analytics storytelling</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Website: https://example.com</li>
+<li>Resume: https://example.com/resume.pdf</li>
+<li>GitHub: https://github.com/your-handle</li>
+<li>LinkedIn: https://linkedin.com/in/your-handle</li>
+<li>X/Twitter: https://x.com/your-handle</li>
+</ul>
+<h2>Projects to Mention</h2>
+<ol>
+<li>Project A - short impact statement.</li>
+<li>Project B - short impact statement.</li>
+</ol>
+<p>---</p>
+<h2>Introduction</h2>
+<p>T20 cricket is a spectacle of rapid-fire action, where fortunes can flip in a single over. The raw scoreline tells you the outcome, but it rarely captures the heart-stopping journey of momentum shifts. As an AI Engineer and Product Builder, I&#x27;m fascinated by how data and analytics can illuminate these hidden narratives, transforming raw numbers into compelling insights.</p>
+<p>In this post, we&#x27;ll peel back the layers of a classic T20 finish to understand how win probability models track the ebb and flow of a match. We&#x27;ll use a specific scenario to highlight what numbers truly matter when the pressure is on.</p>
+<h2>Table of Contents</h2>
+<ol>
+<li>The Volatility of T20 Cricket</li>
+<li>What is Win Probability (WP)?</li>
+<li>A Case Study: The Nail-Biting Chase</li>
+<li>Beyond Runs and Wickets: What Numbers Really Matter</li>
+<li>The Anatomy of a Momentum Shift</li>
+<li>Limitations and Lessons Learned</li>
+<li>Conclusion</li>
+</ol>
+<h2>1. The Volatility of T20 Cricket</h2>
+<p>T20 cricket is designed for excitement. With only 120 balls per side, every delivery, every run, and every wicket has amplified significance. Unlike Test matches or ODIs, where there&#x27;s more time to recover from setbacks, T20 matches demand constant vigilance and quick adaptation.</p>
+<p>This inherent volatility makes it a perfect playground for analytics. Traditional scorecards only tell part of the story. To truly understand the game, we need metrics that can quantify the shifting balance of power in real-time.</p>
+<h2>2. What is Win Probability (WP)?</h2>
+<p>Win Probability (WP) is an analytical model that estimates the likelihood of each team winning at any given point in a match. These models typically factor in:</p>
+<p>*   <strong>Runs scored/needed:</strong> The current score and target.</p>
+<p>*   <strong>Wickets lost/remaining:</strong> How many batsmen are still in the dugout.</p>
+<p>*   <strong>Overs bowled/remaining:</strong> The time left in the innings.</p>
+<p>*   <strong>Historical data:</strong> Performance trends on similar pitches, team strengths, head-to-head records.</p>
+<p>*   <strong>Player form:</strong> Individual batsman and bowler statistics.</p>
+<p>WP is usually presented as a percentage, dynamically updating after every ball. It&#x27;s a powerful tool for understanding momentum.</p>
+<h2>3. A Case Study: The Nail-Biting Chase</h2>
+<p>Let&#x27;s consider a specific T20 scenario:</p>
+<p>*   <strong>Team A scores: 168/7</strong></p>
+<p>*   <strong>Team B wins with: 169/6 in 19.4 overs</strong></p>
+<p>At first glance, Team A set a competitive total. 168 is a good score in many T20 games. Team B then chased it down, losing six wickets, with just two balls to spare. This isn&#x27;t just a win; it&#x27;s a dramatic, down-to-the-wire victory.</p>
+<p>Imagine the win probability graph for this match:</p>
+<p>*   <strong>Innings Break (Team A: 168/7):</strong> Team A&#x27;s WP would likely be around 55-65%, depending on the pitch and conditions. They&#x27;ve posted a strong total.</p>
+<p>*   <strong>Early Chase (Team B):</strong> Team B&#x27;s WP would fluctuate. If they start strong, it rises. If they lose early wickets, it dips sharply.</p>
+<p>*   <strong>Mid-Chase:</strong> This is often where the game is finely balanced. Partnerships build, required run rates climb.</p>
+<p>*   <strong>The Climax (Team B: 169/6 in 19.4 overs):</strong> This is where the magic happens. As Team B approached the target in the final over, their WP would have surged dramatically. The fact they won with 2 balls remaining, having lost 6 wickets, indicates a very close finish where WP would have been swinging wildly between 50-50 in the last few overs.</p>
+<p>*(Imagine a chart here showing Team A&#x27;s WP starting high, dipping as Team B chases, then Team B&#x27;s WP spiking in the final over to 100% at the 19.4 over mark.)*</p>
+<h2>4. Beyond Runs and Wickets: What Numbers Really Matter</h2>
+<p>While runs, wickets, and overs are the foundational data points, a deeper analysis considers several other crucial factors:</p>
+<p>*   <strong>Required Run Rate (RRR):</strong> This is the most immediate pressure metric for the chasing team. It tells them how many runs they need per over to win. As the RRR climbs, the probability of winning decreases.</p>
+<p>*   <strong>Partnership Strength:</strong> A strong, unbroken partnership is gold in a chase. It stabilizes the innings and puts pressure back on the bowling side. WP models give significant weight to active partnerships.</p>
+<p>*   <strong>Bowler Matchups:</strong> Which bowler is bowling the crucial death overs? Do they have a good record against the current batsmen? These micro-matchups significantly influence WP.</p>
+<p>*   <strong>Pitch Conditions:</strong> Is the pitch slowing down? Is it offering turn or seam movement? A pitch that changes character can drastically alter the target&#x27;s perceived difficulty.</p>
+<p>*   <strong>DLS Par Score (in rain-affected games):</strong> While not explicitly in our scenario, in shortened games, the Duckworth-Lewis-Stern method introduces another layer of complexity, where the &quot;par score&quot; becomes the critical number.</p>
+<p>For Team B to win with 169/6 in 19.4 overs, they likely managed the RRR exceptionally well in the final overs, perhaps with a key batsman hitting boundaries under immense pressure, or a strong partnership holding firm.</p>
+<h2>5. The Anatomy of a Momentum Shift</h2>
+<p>The shift from 168/7 (Team A&#x27;s strong position) to 169/6 in 19.4 overs (Team B&#x27;s victory) is a classic momentum shift.</p>
+<ol>
+<li><strong>Innings Break:</strong> Team A has the psychological edge. Their WP is higher.</li>
+<li><strong>Early Wickets for Team B:</strong> If Team B loses early wickets, their WP plummets. Team A&#x27;s WP rises.</li>
+<li><strong>Stabilizing Partnership:</strong> A crucial partnership for Team B brings their WP back up.</li>
+<li><strong>Death Overs Pressure:</strong> As the game enters the final 5 overs, the RRR becomes critical. Every boundary hit by Team B sends their WP soaring; every wicket lost sends it crashing.</li>
+<li><strong>The Final Over:</strong> This is where the WP graph becomes a rollercoaster. With 6 wickets down and only 2 balls to spare, Team B&#x27;s WP would have been extremely high in the moments before the winning runs, but the path to get there would have been fraught with uncertainty. The fact they won with 6 wickets down suggests a few late boundaries sealed the deal.</li>
+</ol>
+<p>*(A visual representation here, perhaps a line graph showing WP over time, with annotations for key events like &quot;Wicket falls,&quot; &quot;Boundary hit,&quot; &quot;Crucial partnership.&quot;)*</p>
+<h2>6. Limitations and Lessons Learned</h2>
+<p>While win probability models are powerful, they aren&#x27;t infallible.</p>
+<p>*   <strong>Human Element:</strong> Models struggle to account for extraordinary individual brilliance (a miraculous catch, an impossible six) or sudden collapses due to pressure.</p>
+<p>*   <strong>Unforeseen Events:</strong> Injuries, controversial umpiring decisions, or sudden changes in weather can impact outcomes in ways models can&#x27;t perfectly predict.</p>
+<p>*   <strong>Data Lag:</strong> Real-time models are constantly improving, but there can still be a slight lag between an event and its full integration into the WP calculation.</p>
+<p>The lesson here is that while analytics provides incredible insight and helps us quantify the game, it doesn&#x27;t diminish the human drama. Instead, it enhances our appreciation for the athletes who perform under immense pressure, often defying statistical odds. It teaches us to look beyond the final score and appreciate the journey.</p>
+<h2>7. Conclusion</h2>
+<p>The T20 match scenario – Team A&#x27;s 168/7 countered by Team B&#x27;s 169/6 in 19.4 overs – perfectly encapsulates the dynamic nature of cricket. Win probability models offer a sophisticated lens through which to view these contests, revealing the subtle shifts in momentum that define a game.</p>
+<p>As an AI Engineer, I see immense potential in refining these models further, integrating more granular data points and leveraging advanced machine learning techniques to provide even richer, more predictive insights. But ultimately, the beauty of cricket, like any sport, lies in its unpredictability and the sheer human will to win. Analytics simply helps us understand the incredible story unfolding, ball by ball.</p>
+          </article>
+        </main>
+        </body>
+</html>
