@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Blog Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .glass { backdrop-filter: blur(8px); }
+    .prose h1 { font-size: 2rem; font-weight: 800; margin-top: 1rem; margin-bottom: .75rem; }
+    .prose h2 { font-size: 1.4rem; font-weight: 700; margin-top: 1.2rem; margin-bottom: .6rem; }
+    .prose h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1rem; margin-bottom: .4rem; }
+    .prose p { color: #d1d5db; line-height: 1.75; margin: .65rem 0; }
+    .prose ul, .prose ol { margin: .8rem 0 .8rem 1.1rem; color: #d1d5db; }
+    .prose li { margin: .2rem 0; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+    <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(56,189,248,0.15),transparent_34%),radial-gradient(circle_at_80%_0%,rgba(168,85,247,0.12),transparent_26%)]"></div>
+    <main class="mx-auto max-w-6xl p-6 md:p-10">
+      <section class="glass overflow-hidden rounded-3xl border border-slate-700/70 bg-slate-900/65 p-8 shadow-2xl">
+        <p class="inline-flex rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs font-medium tracking-wide text-cyan-300">Open Source AI Blog Generator</p>
+        <h1 class="mt-4 text-4xl font-black tracking-tight">Ship AI-written blogs from your raw analysis notes.</h1>
+        <p class="mt-3 max-w-3xl text-slate-300">Drop a markdown/text draft, trigger GitHub Actions, and auto-publish polished posts to a Vercel-ready static site.</p>
+        <div class="prose mt-8 max-w-none"><h1>Your Name</h1>
+<h2>About</h2>
+<p>I am a data-focused builder who turns analysis into practical product ideas.</p>
+<h2>Role</h2>
+<ul>
+<li>Profession: AI Engineer / Product Builder</li>
+<li>Focus: LLM apps, automation, analytics storytelling</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Website: https://example.com</li>
+<li>Resume: https://example.com/resume.pdf</li>
+<li>GitHub: https://github.com/your-handle</li>
+<li>LinkedIn: https://linkedin.com/in/your-handle</li>
+<li>X/Twitter: https://x.com/your-handle</li>
+</ul>
+<h2>Projects to Mention</h2>
+<ol>
+<li>Project A - short impact statement.</li>
+<li>Project B - short impact statement.</li>
+</ol>
+<h2>Writing Tone</h2>
+<p>Friendly, practical, and direct. Explain tradeoffs clearly. Keep paragraphs short.</p></div>
+      </section>
+
+      <section class="mt-10">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-2xl font-bold">Published Posts</h2>
+          <span class="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-400">1 total</span>
+        </div>
+        <div class="grid gap-4 md:grid-cols-2"><a href="/blog/20260220-sample-generated-post.html" class="group block rounded-2xl border border-slate-700/60 bg-slate-900/70 p-6 transition hover:-translate-y-0.5 hover:border-cyan-400/70 hover:shadow-[0_0_24px_rgba(34,211,238,0.2)]"><p class="text-xs uppercase tracking-wider text-cyan-300/80">2026-02-20</p><h3 class="mt-2 text-xl font-semibold text-white group-hover:text-cyan-100">From raw support chaos to a focused AI triage workflow</h3><p class="mt-3 text-sm leading-6 text-slate-300">A practical breakdown of prompt iteration, guardrails, and rollout lessons from reducing first response times.</p><p class="mt-5 text-sm text-cyan-300">Read article →</p></a></div>
+      </section>
+    </main>
+    </body>
+</html>
