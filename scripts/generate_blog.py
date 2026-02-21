@@ -72,7 +72,7 @@ def provider_from_env() -> ProviderConfig:
         ),
         "gemini": ProviderConfig(
             "gemini",
-            env_or_default("GEMINI_MODEL", "gemini-2.5-flash"),
+            env_or_default("GEMINI_MODEL", "gemini-1.5-flash"),
             os.getenv("GEMINI_API_KEY", "").strip(),
             "https://generativelanguage.googleapis.com/v1beta",
         ),

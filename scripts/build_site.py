@@ -13,6 +13,16 @@ POSTS_DIR = ROOT / "generated_posts"
 SITE_DIR = ROOT / "site"
 
 
+def extract_author_name(profile_raw: str) -> str:
+    for line in profile_raw.splitlines():
+        text = line.strip()
+        if text.startswith("#"):
+            name = text.lstrip("# ").strip()
+            if name:
+                return name
+    return "Author"
+
+
 def md_line_to_html(line: str) -> str:
     line = line.rstrip()
     if not line:
@@ -130,7 +140,7 @@ def build() -> None:
     blog_dir.mkdir(parents=True, exist_ok=True)
 
     profile_raw = PROFILE_PATH.read_text(encoding="utf-8") if PROFILE_PATH.exists() else "# Your Name"
-    profile_html = markdown_to_html(profile_raw)
+    author_name = extract_author_name(profile_raw)
 
     posts = []
     for path in sorted(POSTS_DIR.glob("*.md"), reverse=True):
@@ -165,7 +175,10 @@ def build() -> None:
         <p class=\"inline-flex rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs font-medium tracking-wide text-cyan-300\">Open Source AI Blog Generator</p>
         <h1 class=\"mt-4 text-4xl font-black tracking-tight\">Ship AI-written blogs from your raw analysis notes.</h1>
         <p class=\"mt-3 max-w-3xl text-slate-300\">Drop a markdown/text draft, trigger GitHub Actions, and auto-publish polished posts to a Vercel-ready static site.</p>
-        <div class=\"prose mt-8 max-w-none\">{profile_html}</div>
+        <div class="mt-8">
+          <p class="text-xs uppercase tracking-widest text-slate-400">Author</p>
+          <p class="mt-2 text-2xl font-bold text-white">{html.escape(author_name)}</p>
+        </div>
       </section>
 
       <section class=\"mt-10\">
