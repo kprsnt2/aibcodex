@@ -9,7 +9,7 @@ import os
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib import request
+from urllib import error, request
 
 
 @dataclass
@@ -18,6 +18,11 @@ class ProviderConfig:
     model: str
     api_key: str
     base_url: str
+
+
+def env_or_default(name: str, default: str) -> str:
+    value = os.getenv(name)
+    return value.strip() if value and value.strip() else default
 
 
 def read_text(path: Path) -> str:
@@ -46,41 +51,35 @@ def provider_from_env() -> ProviderConfig:
     """Resolve provider from AI_PROVIDER or auto-detect from available API keys."""
     forced = os.getenv("AI_PROVIDER", "").strip().lower()
 
-    openai_key = os.getenv("OPENAI_API_KEY", "")
-    openrouter_key = os.getenv("OPENROUTER_API_KEY", "")
-    nvidia_key = os.getenv("NVIDIA_API_KEY", "")
-    gemini_key = os.getenv("GEMINI_API_KEY", "")
-    claude_key = os.getenv("CLAUDE_API_KEY", "")
-
     mapping = {
         "openai": ProviderConfig(
             "openai",
-            os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-            openai_key,
-            os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+            env_or_default("OPENAI_MODEL", "gpt-4o-mini"),
+            os.getenv("OPENAI_API_KEY", "").strip(),
+            env_or_default("OPENAI_BASE_URL", "https://api.openai.com/v1"),
         ),
         "openrouter": ProviderConfig(
             "openrouter",
-            os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
-            openrouter_key,
-            os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
+            env_or_default("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
+            os.getenv("OPENROUTER_API_KEY", "").strip(),
+            env_or_default("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
         ),
         "nvidia": ProviderConfig(
             "nvidia",
-            os.getenv("NVIDIA_MODEL", "meta/llama-3.1-70b-instruct"),
-            nvidia_key,
-            os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"),
+            env_or_default("NVIDIA_MODEL", "meta/llama-3.1-70b-instruct"),
+            os.getenv("NVIDIA_API_KEY", "").strip(),
+            env_or_default("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"),
         ),
         "gemini": ProviderConfig(
             "gemini",
-            os.getenv("GEMINI_MODEL", "gemini-3-flash-preview"),
-            gemini_key,
+            env_or_default("GEMINI_MODEL", "gemini-1.5-flash"),
+            os.getenv("GEMINI_API_KEY", "").strip(),
             "https://generativelanguage.googleapis.com/v1beta",
         ),
         "claude": ProviderConfig(
             "claude",
-            os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022"),
-            claude_key,
+            env_or_default("CLAUDE_MODEL", "claude-3-5-sonnet-20241022"),
+            os.getenv("CLAUDE_API_KEY", "").strip(),
             "https://api.anthropic.com/v1",
         ),
     }
@@ -133,8 +132,13 @@ draft_source:
 def http_post_json(url: str, payload: dict, headers: dict[str, str]) -> dict:
     data = json.dumps(payload).encode("utf-8")
     req = request.Request(url, data=data, headers={"content-type": "application/json", **headers}, method="POST")
-    with request.urlopen(req, timeout=120) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    try:
+        with request.urlopen(req, timeout=120) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="ignore")
+        message = body[:600] if body else exc.reason
+        raise RuntimeError(f"Provider request failed ({exc.code}) at {url}: {message}") from exc
 
 
 def generate_with_openai_compatible(config: ProviderConfig, prompt: str) -> str:
@@ -149,8 +153,8 @@ def generate_with_openai_compatible(config: ProviderConfig, prompt: str) -> str:
     headers = {"authorization": f"Bearer {config.api_key}"}
 
     if config.name == "openrouter":
-        headers["HTTP-Referer"] = os.getenv("OPENROUTER_SITE_URL", "https://example.com")
-        headers["X-Title"] = os.getenv("OPENROUTER_APP_NAME", "Open AI Blog Generator")
+        headers["HTTP-Referer"] = env_or_default("OPENROUTER_SITE_URL", "https://example.com")
+        headers["X-Title"] = env_or_default("OPENROUTER_APP_NAME", "Open AI Blog Generator")
 
     data = http_post_json(f"{config.base_url}/chat/completions", payload, headers)
     choices = data.get("choices", [])
@@ -234,4 +238,8 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as exc:
+        print(f"ERROR: {exc}")
+        raise SystemExit(1)
