@@ -104,6 +104,6 @@ python scripts/build_site.py
 
 ## Troubleshooting
 
-- **HTTP 404 from Gemini**: this usually means an invalid/retired model name. Leave `GEMINI_MODEL` unset to use the default (`gemini-1.5-flash`) or set a valid model explicitly.
+- **HTTP 404 from Gemini**: this usually means an invalid/retired model name. Leave `GEMINI_MODEL` unset to use the default (`gemini-flash-latest`) or set a valid model explicitly.
 - **No API key configured**: set at least one key (`OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, `GEMINI_API_KEY`, or `CLAUDE_API_KEY`).
 - **Need strict provider selection**: set `AI_PROVIDER` to one of `openai`, `openrouter`, `nvidia`, `gemini`, `claude`.
