@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How we reduced support response time by 47% with an AI triage assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .glass { backdrop-filter: blur(8px); }
+    .prose h1 { font-size: 2rem; font-weight: 800; margin-top: 1rem; margin-bottom: .75rem; }
+    .prose h2 { font-size: 1.4rem; font-weight: 700; margin-top: 1.2rem; margin-bottom: .6rem; }
+    .prose h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1rem; margin-bottom: .4rem; }
+    .prose p { color: #d1d5db; line-height: 1.75; margin: .65rem 0; }
+    .prose ul, .prose ol { margin: .8rem 0 .8rem 1.1rem; color: #d1d5db; }
+    .prose li { margin: .2rem 0; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+        <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_0%_10%,rgba(56,189,248,0.10),transparent_38%),radial-gradient(circle_at_100%_0%,rgba(168,85,247,0.10),transparent_30%)]"></div>
+        <main class="mx-auto max-w-3xl p-6 md:p-10">
+          <a class="inline-flex rounded-full border border-slate-700 px-3 py-1 text-sm text-cyan-300 hover:border-cyan-400" href="/index.html">← Back to home</a>
+          <article class="prose mt-6 rounded-3xl border border-slate-700/60 bg-slate-900/75 p-8 shadow-2xl">
+            <h1>How we reduced support response time by 47% with an AI triage assistant</h1>
+            <p class="text-slate-400">2026-11-09</p>
+            <h1>How we reduced support response time by 47% with an AI triage assistant</h1>
+<h2>Context</h2>
+<p>We handle ~1,800 support messages per week. Manual triage was the bottleneck and delayed first response.</p>
+<h2>Data points</h2>
+<ul>
+<li>Baseline median first response: 8.5 hours</li>
+<li>After rollout: 4.5 hours</li>
+<li>After second prompt iteration: 3.6 hours</li>
+<li>Human escalation rate remained stable at 22%</li>
+</ul>
+<h2>What we built</h2>
+<ul>
+<li>Classifier (billing, product bug, account access, feedback)</li>
+<li>Urgency scoring using simple heuristic + LLM sentiment/context</li>
+<li>Suggested draft response for agent review</li>
+</ul>
+<h2>Evidence</h2>
+<figure class="my-6 overflow-hidden rounded-xl border border-slate-700/70"><img src="./images/support-response-trend.png" alt="Weekly response trend" class="w-full" /><figcaption class="px-4 py-2 text-sm text-slate-400">Weekly response trend</figcaption></figure>
+<figure class="my-6 overflow-hidden rounded-xl border border-slate-700/70"><img src="./images/queue-volume-by-type.png" alt="Queue volume by type" class="w-full" /><figcaption class="px-4 py-2 text-sm text-slate-400">Queue volume by type</figcaption></figure>
+<ul>
+<li>Demo video: https://www.loom.com/share/example-demo</li>
+</ul>
+<h2>Caveats</h2>
+<ul>
+<li>Model occasionally over-prioritized emotional language.</li>
+<li>We improved this by adding policy examples and confidence thresholds.</li>
+</ul>
+<h2>Desired blog outcome</h2>
+<ul>
+<li>Teach founders how to start with small automation.</li>
+<li>Share practical architecture and prompt evolution.</li>
+<li>Include a section on what failed first.</li>
+</ul>
+          </article>
+        </main>
+        </body>
+</html>
