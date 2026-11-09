@@ -47,8 +47,8 @@ def slugify(value: str) -> str:
     return slug.strip("-") or "generated-post"
 
 
-def provider_from_env() -> ProviderConfig:
-    """Resolve provider from AI_PROVIDER or auto-detect from available API keys."""
+def providers_from_env() -> list[ProviderConfig]:
+    """Resolve candidate providers from AI_PROVIDER or auto-detect from available API keys."""
     forced = os.getenv("AI_PROVIDER", "").strip().lower()
 
     mapping = {
@@ -84,22 +84,11 @@ def provider_from_env() -> ProviderConfig:
         ),
     }
 
-    if forced:
-        if forced not in mapping:
-            raise ValueError("Unsupported AI_PROVIDER. Use openai/openrouter/nvidia/gemini/claude")
-        config = mapping[forced]
-        if not config.api_key:
-            raise RuntimeError(f"Missing key for forced provider '{forced}'")
-        return config
+    order = ["openai", "openrouter", "nvidia", "gemini", "claude"]
+    if forced in mapping:
+        order = [forced] + [name for name in order if name != forced]
 
-    for name in ["openai", "openrouter", "nvidia", "gemini", "claude"]:
-        if mapping[name].api_key:
-            return mapping[name]
-
-    raise RuntimeError(
-        "No API key configured. Set one key: OPENAI_API_KEY or OPENROUTER_API_KEY or NVIDIA_API_KEY "
-        "(gemini/claude also supported)."
-    )
+    return [mapping[name] for name in order if mapping[name].api_key]
 
 
 def build_prompt(profile_md: str, draft_md: str, draft_filename: str) -> str:
@@ -218,14 +207,30 @@ def main() -> None:
 
     title = extract_title(draft_md, draft_path)
     prompt = build_prompt(profile_md, draft_md, draft_path.name)
-    provider = provider_from_env()
+    candidates = providers_from_env()
 
-    if provider.name in {"openai", "openrouter", "nvidia"}:
-        raw = generate_with_openai_compatible(provider, prompt)
-    elif provider.name == "gemini":
-        raw = generate_with_gemini(provider, prompt)
-    else:
-        raw = generate_with_claude(provider, prompt)
+    raw = ""
+    used_provider = "fallback-draft"
+    used_model = "deterministic"
+
+    for provider in candidates:
+        try:
+            if provider.name in {"openai", "openrouter", "nvidia"}:
+                raw = generate_with_openai_compatible(provider, prompt)
+            elif provider.name == "gemini":
+                raw = generate_with_gemini(provider, prompt)
+            else:
+                raw = generate_with_claude(provider, prompt)
+            if raw.strip():
+                used_provider = provider.name
+                used_model = provider.model
+                break
+        except Exception as exc:
+            print(f"WARNING: Provider {provider.name} ({provider.model}) failed: {exc}")
+
+    if not raw.strip():
+        print("WARNING: All remote AI providers failed or were unconfigured; using deterministic draft formatter.")
+        raw = draft_md
 
     post = ensure_frontmatter(raw, title=title, draft_source=str(draft_path))
 
@@ -234,7 +239,7 @@ def main() -> None:
         return
 
     output_path = write_post(Path(args.outdir), title, post)
-    print(json.dumps({"generated_post": str(output_path), "provider": provider.name, "model": provider.model}))
+    print(json.dumps({"generated_post": str(output_path), "provider": used_provider, "model": used_model}))
 
 
 if __name__ == "__main__":
